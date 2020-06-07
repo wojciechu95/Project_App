@@ -1,0 +1,58 @@
+﻿
+@{
+    ViewData["Title"] = "Kontakt";
+}
+
+<div class="bg-contact2" style="background-image: url('images/bg-01.jpg');">
+    <div class="container-contact2">
+        <div class="wrap-contact2">
+            <span class="contact2-form-title">
+                Contact Us
+            </span>
+            <div class="wrap-input2 validate-input" data-validate="Name is required">
+                <input class="input2" type="text" id="name">
+                <span class="focus-input2" data-placeholder="NAME"></span>
+            </div>
+            <div class="wrap-input2 validate-input" data-validate="Valid email is required: ex@abc.xyz">
+                <input class="input2" type="text" id="email">
+                <span class="focus-input2" data-placeholder="EMAIL"></span>
+            </div>
+            <div class="wrap-input2 validate-input" data-validate="Message is required">
+                <textarea class="input2" id="message"></textarea>
+                <span class="focus-input2" data-placeholder="MESSAGE"></span>
+            </div>
+            <div class="container-contact2-form-btn">
+                <div class="wrap-contact2-form-btn">
+                    <div class="contact2-form-bgbtn"></div>
+                    <button class="contact2-form-btn" onclick="SendEmail()">
+                        Send Your Message
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function SendEmail(){
+      $.ajax(
+      {
+        type: "POST",
+        url: '@Url.Action("SendEmail", "MailSender")',
+        data: {
+          Name: $("#name").val(),
+          Email: $("#email").val(),
+          Message: $("#message").val()
+        },
+        error: function (result) {
+          console.log(result);
+        },
+        success: function (result) {
+          alert(result);
+          $("#name").val("");
+          $("#email").val("");
+          $("#message").val("");
+        }
+      });
+    }
+</script>

@@ -1,0 +1,39 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Logoinowanie.Areas.Identity.Data
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "PWallet";
+}
+<div class="container row pow-0 m-0">
+    <div class="col-9">
+        <h1 class="text-info">Cześć @UserManager.GetUserAsync(User).Result.FirstName w aplikacji <i class="fas fa-wallet"></i> PWallet</h1>
+    </div>
+    <div class="col-3">
+        <a asp-action="upsert" asp-controller="wallet" class="btn btn-info form-control">Utwórz</a>
+    </div>
+    <div class="container row pow-0 m-0">
+        <div class="col-12 border p-3 bg-light">
+            <div class="col-12">
+                <h2 class="text-info text-center"><i class="fas fa-wallet"></i> PWallet</h2>
+            </div>
+            
+            <table id="DT_load" class="table table-striped table-bordered" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Strona</th>
+                        <th>Login</th>
+                        <th>Hasło</th>
+                        <th></th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/js/WalletTable.js"></script>
+}

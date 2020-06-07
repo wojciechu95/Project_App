@@ -1,0 +1,88 @@
+﻿@model IEnumerable<PasswdModel>
+
+@{
+    ViewData["Title"] = "Detail";
+}
+
+<h1>Detail</h1>
+
+@if (Model == null)
+{
+    <div>
+        <p colspan="7" class="text-center">No Model Data</p>
+    </div>
+}
+else
+{
+    @foreach (var p in Model)
+    {
+        <div class="form-group row">
+            <div class="col-3">
+                <label asp-for="@p.Email"></label>
+            </div>
+            <div class="col-6">
+                <p> @p.Email </p>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-3">
+                <label asp-for="@p.UrlP"></label>
+            </div>
+            <div class="col-6">
+                <p> @p.UrlP </p>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-3">
+                <label asp-for="@p.Login"></label>
+            </div>
+            <div class="col-6">
+                <p> @p.Login </p>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-3">
+                <label asp-for="@p.Passwd"></label>
+            </div>
+            <div class="col-6">
+                <p><span id="haslo">@p.Passwd </span><span style="width: 30px;"> </span><button id="button"> <i class="fas fa-eye"></i></button></p>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-3">
+                <label asp-for="@p.Description"></label>
+            </div>
+            <div class="col-6">
+                <p>@p.Description</p>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-3 offset-3">
+                <a href="upsert?Id=@p.ID" class="btn btn-info form-control">
+                    Aktualizuj
+                </a>
+            </div>
+            <div class="col-3">
+                <a asp-action="Index" class="btn btn-success form-control">
+                    Cofnij do listy
+                </a>
+            </div>
+        </div>
+
+    }
+}
+
+@section Scripts{
+    <script>
+        var isClicked = true;
+        var password = $('#haslo').text();
+        myFuncjon();
+        $("#button").click(function () {
+            myFuncjon();
+        });
+        function myFuncjon() {
+            isClicked = !isClicked;
+            $('#haslo').text(isClicked ? password : password.replace(/[^]/gi, '*'));
+        }
+    </script>
+}
