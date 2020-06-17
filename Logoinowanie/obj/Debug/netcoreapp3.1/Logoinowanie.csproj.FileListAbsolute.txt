@@ -190,7 +190,6 @@ C:\Users\Wojtek\Documents\visual\Logoinowanie\Logoinowanie\obj\Debug\netcoreapp3
 C:\Users\Wojtek\Documents\visual\Logoinowanie\Logoinowanie\obj\Debug\netcoreapp3.1\Razor\Views\Home\Contact.cshtml.g.cs
 C:\Users\Wojtek\Documents\visual\Logoinowanie\Logoinowanie\obj\Debug\netcoreapp3.1\Razor\Views\Home\Offer.cshtml.g.cs
 C:\Users\Wojtek\Documents\visual\Logoinowanie\Logoinowanie\obj\Debug\netcoreapp3.1\Logoinowanie.genruntimeconfig.cache
-C:\Users\Wojtek\Documents\visual\Logoinowanie\Logoinowanie\bin\Debug\netcoreapp3.1\SendGrid.dll
 C:\Users\Wojtek\Documents\visual\Logoinowanie\Logoinowanie\obj\Debug\netcoreapp3.1\Razor\Areas\Identity\Pages\_loginLayout.cshtml.g.cs
 C:\Users\Wojtek\Documents\visual\Logoinowanie\Logoinowanie\obj\Debug\netcoreapp3.1\Razor\Views\Wallet\Index.cshtml.g.cs
 C:\Users\Wojtek\Documents\visual\Logoinowanie\Logoinowanie\obj\Debug\netcoreapp3.1\Razor\Views\Wallet\Upsert.cshtml.g.cs

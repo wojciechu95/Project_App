@@ -13,21 +13,21 @@ $(document).ready(function () {
 });
 
 function loadDataTable() {
-    var id = 0;
-
+    let id = 0;
     dataTable = $('#DT_load').DataTable({
+
         "ajax": {
             "url": "wallet/getall",
             "type": "GET",
-            "datatype": "json"
+            "datatype": "json",
+            "deferRender": true
         },
         "columns": [
             { "data": "urlP", "width": "20%" },
             { "data": "login", "width": "20%" },
             {
                 "data": "passwd",
-                "render": function (data) {
-                    id = id+1;
+                "render": function (data) {                    
                     return `<td><span id="haslo${id}">${data} </span><button id="button${id}"> <i class="fas fa-eye"></i></button>
                             <script>
                                 var isClicked${id} = true;
@@ -38,7 +38,7 @@ function loadDataTable() {
                                 });
                                 function myFuncjon${id}() {
                                     isClicked${id} = !isClicked${id};
-                                    $('#haslo${id}').text(isClicked${id} ? password${id} : password${id}.replace(/[^]/gi, '*'));
+                                    $('#haslo${id}').text(isClicked${id} ? password${id} : password${id++}.replace(/[^]/gi, '*'));
                                 }
                             </script>
                             </td>`
@@ -46,9 +46,9 @@ function loadDataTable() {
             },
             {
                 "data": "id",
-                "render": function (data) { id = data;
+                "render": function (data) {
                     return `<div class="text-center">
-                        <a href="/wallet/detail?id=${id}" class='btn btn-info text-white' style='cursor:pointer; width:75px;'>
+                        <a href="/wallet/detail?id=${data}" class='btn btn-info text-white' style='cursor:pointer; width:75px;'>
                             Więcej
                         </a>
                         &nbsp;
@@ -64,8 +64,31 @@ function loadDataTable() {
                 }, "width": "75%"
             }
         ],
+        // Set rows IDs
+        rowId: function (a) {
+            return 'id_' + a.id;
+        },
+        "pagingType": "full_numbers",
         "language": {
-            "emptyTable": "Nie znaleziono danych"
+            "decimal": ",",
+            "thousands": " ",
+            "emptyTable": "Nie znaleziono danych",
+            "info": "Wyświetlono _START_ do _END_ z _TOTAL_ wierszy",
+            "infoEmpty": "Wyświetlono 0 do 0 z 0 wierszy",
+            "infoPostFix": "",
+            "thousands": ",",
+            "lengthMenu": "Wyświetl _MENU_ wierszy",
+            "loadingRecords": "Ładowanie...",
+            "processing": "Przetwarzanie...",
+            "search": "Szukaj:",
+            "infoFiltered": "(Przefiltrowano z _MAX_ wszystkich wierszy)",
+            "zeroRecords": "Nie znaleziono pasujących rekordów",
+            "paginate": {
+                "first": `<i class="fas fa-angle-double-left"></i>`,
+                "last": `<i class="fas fa-angle-double-right"></i>`,
+                "previous": `<i class="fas fa-angle-left"></i>`,
+                "next": `<i class="fas fa-angle-right"></i>`
+            }
         },
         "width": "100%"
     });
@@ -114,4 +137,114 @@ function Delete(url) {
             )
         }
     });
+}
+
+Edit = (url, title) => {
+    $.ajax({
+        type: 'GET',
+        url: url,
+        success: function (todo) {
+
+            let idD = todo.id
+                ? `<input name="id" value="${todo.id}" hidden />`
+                : ``;
+            let des = todo.description
+                ? `${todo.description}`
+                : ``;
+            let tD = todo.targetDate
+                ? `${todo.targetDate}`
+                : ``;
+            let isD = todo.isDone
+                ? `checked="checked" `
+                : ``;
+
+            $('#form-modal .modal-body').html(`         
+            <form id="editApi" method="post">
+                ${idD}
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label>Description</label>
+                    </div>
+                    <div class="col-6">
+                        <input type="text" name="description" id="description" value="${des}" class="form-control"
+                               required="required"/>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label>Target Date</label>
+                    </div>
+                    <div class="col-6">
+                        <input type="text" name="targetDate" id="targetDate" value="${tD}" class="form-control"
+                               required="required"/>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-3">
+                        <label>Checked</label>
+                    </div>
+                    <div class="col-6">
+                        <input class="display-3" type="checkbox" name="isDone" id="isDone" value="true" 
+                        ${isD}/> <i class="text-success h3 fas fa-clipboard-check"></i>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-3 offset-3">
+                        <button type="submit" onclick="jQueryAjaxPost()" class="btn btn-primary form-control">
+                            Save
+                        </button>
+                    </div>
+                    </div>
+                </div>
+            </form>
+            <script>
+                $(function () {
+                    $("#targetDate").datetimepicker({
+                        format: 'd.m.Y H:i'
+                    });
+                });
+            </script>
+        </div>
+            `);
+            $('#form-modal .modal-title').html(title);
+            $('#form-modal').modal('show');
+        }
+    })
+}
+
+jQueryAjaxPost = form => {
+    try {
+        $("#editApi").submit(function (e) {
+            form = $(this);
+            console.log(form.serialize());
+
+            $.ajax({
+                type: 'POST',
+                url: '/wallet/apiupsert',
+                data: form.serialize(),
+                success: function (todo) {
+                    console.log('success')
+                    if (todo) {
+                        $('#view-all').html(todo)
+                        $('#form-modal .modal-body').html('');
+                        $('#form-modal .modal-title').html('');
+                        $('#form-modal').modal('hide');
+                        dataTable.ajax.reload();
+                    }
+                    else
+                        $('#form-modal .modal-body').html(todo.html);
+                },
+                error: function (err) {
+                    console.log('Error Ajax')
+                    console.log(err)
+                }
+            })
+            //to prevent default form submit event
+            return false;
+        })
+    } catch (ex) {
+
+        console.log('Exception')
+        console.log(ex)
+    }
 }

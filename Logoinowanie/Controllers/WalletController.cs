@@ -46,7 +46,7 @@ namespace Logoinowanie.Controllers
             List<PasswdModel> passwdlist = new List<PasswdModel>();
             string connectionString = Configuration["ConnectionStrings:MySQLConnection"];
 
-            using (MySqlConnection connection = new MySqlConnection (connectionString))
+            using (MySqlConnection connection = new MySqlConnection(connectionString)) 
             {
                 //MySqlDataReader
                 connection.Open();
@@ -57,18 +57,19 @@ namespace Logoinowanie.Controllers
                 {
                     while (dataReader.Read())
                     {
-                        PasswdModel passmodel = new PasswdModel();
+                        PasswdModel passmodel = new PasswdModel
+                        {
+                            ID = Convert.ToInt32(dataReader["ID"]),
+                            Login = Convert.ToString(dataReader["Login"]),
+                            UrlP = Convert.ToString(dataReader["UrlP"]),
+                            Email = Convert.ToString(dataReader["Email"]),
+                            Description = Convert.ToString(dataReader["Description"]),
 
-                        passmodel.ID = Convert.ToInt32(dataReader["ID"]);
-                        passmodel.Login = Convert.ToString(dataReader["Login"]);
-                        passmodel.UrlP = Convert.ToString(dataReader["UrlP"]);
-                        passmodel.Email = Convert.ToString(dataReader["Email"]);
-                        passmodel.Description = Convert.ToString(dataReader["Description"]);
-
-                        passmodel.Passwd = Encryption.DecryptString(
+                            Passwd = Encryption.DecryptString(
                             Convert.ToString(dataReader["SaltKey"]),
                             Convert.ToString(dataReader["Passwd"]
-                            ));
+                            ))
+                        };
 
                         passwdlist.Add(passmodel);
                     }
@@ -132,13 +133,13 @@ namespace Logoinowanie.Controllers
                             $"'{passmodel.Email}', '{passmodel.UrlP}', '{passmodel.Login}', '{EncryptPass}'," +
                             $"'{userId}','{passmodel.Description}','{Salt}')";
 
-                        using (MySqlCommand command = new MySqlCommand(sql, connection))
+                        using MySqlCommand command = new MySqlCommand(sql, connection)
                         {
-                            command.CommandType = CommandType.Text;
-                            connection.Open();
-                            command.ExecuteNonQuery();
-                            connection.Close();
-                        }
+                            CommandType = CommandType.Text
+                        };
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                        connection.Close();
                     }
 
                     return RedirectToAction("Index");
@@ -146,39 +147,37 @@ namespace Logoinowanie.Controllers
                 else
                 {
                     //Aktualizacja Update ---->
-                    using (MySqlConnection  connection = new MySqlConnection (connectionString))
+                    using MySqlConnection connection = new MySqlConnection(connectionString);
+                    string Salt = "salt";
+                    string sql = "";
+
+                    sql = $"Select Salt From AspNetUsers Where Id='{userId}'";
+                    MySqlCommand commandS = new MySqlCommand(sql, connection);
+                    connection.Open();
+                    using (MySqlDataReader dataReader = commandS.ExecuteReader())
                     {
-                        string Salt = "salt";
-                        string sql = "";
-
-                        sql = $"Select Salt From AspNetUsers Where Id='{userId}'";
-                        MySqlCommand commandS = new MySqlCommand(sql, connection);
-                        connection.Open();
-                        using (MySqlDataReader dataReader = commandS.ExecuteReader())
+                        while (dataReader.Read())
                         {
-                            while (dataReader.Read())
-                            {
-                                Salt = Convert.ToString(dataReader["Salt"]);
-                            }
+                            Salt = Convert.ToString(dataReader["Salt"]);
                         }
-                        commandS.ExecuteNonQuery();
-                        connection.Close();
-
-                        string EncryptPass = Encryption.EncryptString(Salt, passmodel.Passwd);
-
-                        sql = $"Update PWallet SET Email='{passmodel.Email}', UrlP='{passmodel.UrlP}'," +
-                            $" Login='{passmodel.Login}', Description='{passmodel.Description}', Passwd='{EncryptPass}', SaltKey='{Salt}' " +
-                            $"Where ID='{passmodel.ID}'";
-
-                        using (MySqlCommand command = new MySqlCommand(sql, connection))
-                        {
-                            connection.Open();
-                            command.ExecuteNonQuery();
-                            connection.Close();
-                        }
-
-                        return RedirectToAction("Index");
                     }
+                    commandS.ExecuteNonQuery();
+                    connection.Close();
+
+                    string EncryptPass = Encryption.EncryptString(Salt, passmodel.Passwd);
+
+                    sql = $"Update PWallet SET Email='{passmodel.Email}', UrlP='{passmodel.UrlP}'," +
+                        $" Login='{passmodel.Login}', Description='{passmodel.Description}', Passwd='{EncryptPass}', SaltKey='{Salt}' " +
+                        $"Where ID='{passmodel.ID}'";
+
+                    using (MySqlCommand command = new MySqlCommand(sql, connection))
+                    {
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                        connection.Close();
+                    }
+
+                    return RedirectToAction("Index");
                 }
             }
                 return View(PasswdModel);
@@ -193,35 +192,40 @@ namespace Logoinowanie.Controllers
             List<PasswdModel> passwdlist = new List<PasswdModel>();
             string connectionString = Configuration["ConnectionStrings:MySQLConnection"];
 
-            using (MySqlConnection  connection = new MySqlConnection (connectionString))
-            {
+            MySqlConnection connection = new MySqlConnection(connectionString);
+            
                 //MySqlDataReader
                 connection.Open();
-
+            
                 string sql = $"Select * From PWallet Where UserId='{userId}'";
                 MySqlCommand command = new MySqlCommand(sql, connection);
-                using (MySqlDataReader dataReader = command.ExecuteReader())
-                {
+            MySqlDataReader dataReader = command.ExecuteReader();
+                
                     while (dataReader.Read())
                     {
-                        PasswdModel passmodel = new PasswdModel();
-
-                        passmodel.ID = Convert.ToInt32(dataReader["ID"]);
-                        passmodel.Login = Convert.ToString(dataReader["Login"]);
-                        passmodel.UrlP = Convert.ToString(dataReader["UrlP"]);
-                        passmodel.Email = Convert.ToString(dataReader["Email"]);
-                        passmodel.Passwd = Encryption.DecryptString(
+                        PasswdModel passmodel = new PasswdModel
+                        {
+                            ID = Convert.ToInt32(dataReader["ID"]),
+                            Login = Convert.ToString(dataReader["Login"]),
+                            UrlP = Convert.ToString(dataReader["UrlP"]),
+                            Email = Convert.ToString(dataReader["Email"]),
+                            Passwd = Encryption.DecryptString(
                             Convert.ToString(dataReader["SaltKey"]),
                             Convert.ToString(dataReader["Passwd"]
-                            ));
-                        passmodel.UserId = Convert.ToString(dataReader["UserId"]);
+                            )),
+                            UserId = Convert.ToString(dataReader["UserId"])
+                        };
 
                         passwdlist.Add(passmodel);
                     }
-                }
+                
                 connection.Close();
-            }
+            await Task.Delay(1);
             return Json(new { data = passwdlist });
+
+            /*string userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            return Json(new { data = await _db.PWallet.Where(e => e.UserId == userId).ToListAsync() });*/
         }
 
         // GET: Wallet/Delete/5
